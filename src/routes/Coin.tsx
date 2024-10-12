@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import {
   Link,
+  Redirect,
   Route,
   Switch,
+  useHistory,
   useLocation,
   useParams,
   useRouteMatch,
@@ -147,11 +149,26 @@ interface PriceData {
   };
 }
 
-function Coin() {
+const BackButton = () => {
+  const history = useHistory();
+
+  const goBack = () => {
+    history.goBack();
+  };
+
+  return <button onClick={goBack}>뒤로가기</button>;
+};
+
+interface ICoinProps {
+  isDark: boolean;
+}
+
+function Coin({ isDark }: ICoinProps) {
   const { coinId } = useParams<ICoinType>();
   const { state } = useLocation<RouteState>();
   const priceMatch = useRouteMatch("/:coinId/price");
   const chartMatch = useRouteMatch("/:coinId/chart");
+  console.log(chartMatch);
   const { isLoading: infoLoading, data: infoData } = useQuery<InfoData>(
     ["info", coinId],
     () => fetchCoinInfo(coinId)
@@ -193,7 +210,6 @@ function Coin() {
         <Title>
           {state?.name ? state.name : loading ? "Loading..." : infoData?.name}
         </Title>
-        ;
       </Header>
       {loading ? (
         <Loader>Loading...</Loader>
@@ -239,7 +255,7 @@ function Coin() {
               <Price />
             </Route>
             <Route path={`/:coinId/chart`}>
-              <Chart coinId={coinId} />
+              <Chart isDark={isDark} coinId={coinId} />
             </Route>
           </Switch>
         </>
